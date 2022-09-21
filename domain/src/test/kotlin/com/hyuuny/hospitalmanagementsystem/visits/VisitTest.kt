@@ -44,6 +44,17 @@ class VisitTest {
         assertThat(newVisit.diagnosisType.name).isEqualTo(updatedDiagnosisType)
     }
 
+    @Test
+    fun `접수일시 수정`() {
+        val receptionDateTime = LocalDateTime.now()
+        val expectedReceptionDateTime = LocalDateTime.now().minusDays(1)
+        val newVisit = createVisit(receptionDateTime = receptionDateTime)
+        assertThat(newVisit.receptionDateTime).isEqualTo(receptionDateTime)
+
+        newVisit.changeReceptionDateTime(expectedReceptionDateTime)
+        assertThat(newVisit.receptionDateTime).isEqualTo(expectedReceptionDateTime)
+    }
+
     private fun createVisit(
         hospitalId: Long = 1L,
         patient: Patient = createPatient(),
