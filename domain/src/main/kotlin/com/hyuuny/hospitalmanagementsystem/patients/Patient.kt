@@ -2,6 +2,7 @@ package com.hyuuny.hospitalmanagementsystem.patients
 
 import com.hyuuny.hospitalmanagementsystem.domain.BaseEntity
 import com.hyuuny.hospitalmanagementsystem.utils.CodeGenerator
+import com.hyuuny.hospitalmanagementsystem.visits.Visit
 import javax.persistence.*
 
 @Entity
