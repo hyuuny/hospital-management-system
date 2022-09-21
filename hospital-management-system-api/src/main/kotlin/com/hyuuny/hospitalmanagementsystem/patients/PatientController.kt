@@ -4,6 +4,7 @@ import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.server.RepresentationModelAssembler
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.*
 
@@ -27,6 +28,12 @@ class PatientController(
     ): EntityModel<PatientResponse> {
         val updatedPatient = patientService.updatePatient(id, request)
         return patientResourceAssembler.toModel(updatedPatient)
+    }
+
+    @DeleteMapping("/{id}")
+    fun deletePatient(@PathVariable id: Long): ResponseEntity<Any> {
+        patientService.deletePatient(id)
+        return ResponseEntity.noContent().build()
     }
 
     @GetMapping("/{id}")
