@@ -5,10 +5,7 @@ import org.springframework.hateoas.server.RepresentationModelAssembler
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RequestMapping(path = ["/api/v1/patients"], produces = [MediaType.APPLICATION_JSON_VALUE])
 @RestController
@@ -16,6 +13,12 @@ class PatientController(
     private val patientService: PatientService,
     private val patientResourceAssembler: PatientResourceAssembler,
 ) {
+
+    @PostMapping
+    fun createPatient(@RequestBody request: PatientCreateRequest): EntityModel<PatientResponse> {
+        val savedPatient = patientService.createPatient(request)
+        return patientResourceAssembler.toModel(savedPatient)
+    }
 
     @GetMapping("/{id}")
     fun getPatient(@PathVariable id: Long): EntityModel<PatientResponse> {
