@@ -95,4 +95,24 @@ class PatientControllerTest : IntegrationTest() {
             .statusCode(HttpStatus.NO_CONTENT.value())
     }
 
+    @Test
+    fun `환자 상세 조회`() {
+        val request = aPatientCreateRequest()
+        val savedPatient = patientService.createPatient(request)
+
+        given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .log().all()
+            .get("$PATIENT_REQUEST_URL/{id}", savedPatient.id)
+            .then()
+            .log().all()
+            .statusCode(HttpStatus.OK.value())
+            .assertThat().body(containsString("id"))
+            .assertThat().body("name", equalTo(request.name))
+            .assertThat().body("gender", equalTo(request.gender))
+            .assertThat().body("birthDay", equalTo(request.birthDay))
+            .assertThat().body("mobilePhoneNumber", equalTo(request.mobilePhoneNumber))
+    }
+
 }
