@@ -33,6 +33,17 @@ class VisitTest {
         assertThat(newVisit.visitStatus.name).isEqualTo(updatedVisitStatus)
     }
 
+    @Test
+    fun `진료유형코드 수정`() {
+        val diagnosisType = "D"
+        val updatedDiagnosisType = "T"
+        val newVisit = createVisit()
+        assertThat(newVisit.diagnosisType.name).isEqualTo(diagnosisType)
+
+        newVisit.changeDiagnosisType(updatedDiagnosisType)
+        assertThat(newVisit.diagnosisType.name).isEqualTo(updatedDiagnosisType)
+    }
+
     private fun createVisit(
         hospitalId: Long = 1L,
         patient: Patient = createPatient(),
