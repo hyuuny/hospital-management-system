@@ -20,6 +20,15 @@ class PatientController(
         return patientResourceAssembler.toModel(savedPatient)
     }
 
+    @PutMapping("/{id}")
+    fun updatePatient(
+        @PathVariable id: Long,
+        @RequestBody request: PatientUpdateRequest
+    ): EntityModel<PatientResponse> {
+        val updatedPatient = patientService.updatePatient(id, request)
+        return patientResourceAssembler.toModel(updatedPatient)
+    }
+
     @GetMapping("/{id}")
     fun getPatient(@PathVariable id: Long): EntityModel<PatientResponse> {
         val foundPatient = patientService.getPatient(id)
