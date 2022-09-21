@@ -35,6 +35,17 @@ class PatientTest {
         assertThat(newPatient.name).isEqualTo(updatedName)
     }
 
+    @Test
+    fun `성별 수정`() {
+        val gender = "M"
+        val updatedGender = "F"
+        val newPatient = createPatient(gender = gender)
+        assertThat(newPatient.gender.name).isEqualTo(gender)
+
+        newPatient.changeGender(updatedGender)
+        assertThat(newPatient.gender.name).isEqualTo(updatedGender)
+    }
+
     private fun createPatient(
         hospitalId: Long = 1,
         name: String = "김환자",
