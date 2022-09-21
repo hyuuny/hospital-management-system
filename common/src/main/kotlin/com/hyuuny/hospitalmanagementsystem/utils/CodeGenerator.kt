@@ -8,6 +8,6 @@ import java.time.format.DateTimeFormatter
 class CodeGenerator {
 
     fun generateCode(): String = LocalDateTime.now()
-        .format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+        .format(DateTimeFormatter.ofPattern("yyyyMMddmmss"))
 
 }
