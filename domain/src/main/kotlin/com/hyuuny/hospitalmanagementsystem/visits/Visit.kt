@@ -11,7 +11,7 @@ class Visit private constructor(
     @Column(nullable = false)
     val hospitalId: Long,
 
-    @Column(unique = true)
+    @JoinColumn(name = "patient_id", unique = true)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     val patient: Patient,
 

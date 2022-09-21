@@ -2,10 +2,12 @@ package com.hyuuny.hospitalmanagementsystem
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 
+@EnableJpaAuditing
 @SpringBootApplication
 class HospitalManagementSystemApplication
 
 fun main(args: Array<String>) {
-	runApplication<HospitalManagementSystemApplication>(*args)
+    runApplication<HospitalManagementSystemApplication>(*args)
 }
