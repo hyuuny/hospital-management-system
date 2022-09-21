@@ -22,6 +22,17 @@ class VisitTest {
         assertThat(newVisit.receptionDateTime).isNotNull
     }
 
+    @Test
+    fun `방문상태코드 수정`() {
+        val visitStatus = "VISITING"
+        val updatedVisitStatus = "CANCELLATION"
+        val newVisit = createVisit()
+        assertThat(newVisit.visitStatus.name).isEqualTo(visitStatus)
+
+        newVisit.changeVisitStatus(updatedVisitStatus)
+        assertThat(newVisit.visitStatus.name).isEqualTo(updatedVisitStatus)
+    }
+
     private fun createVisit(
         hospitalId: Long = 1L,
         patient: Patient = createPatient(),
