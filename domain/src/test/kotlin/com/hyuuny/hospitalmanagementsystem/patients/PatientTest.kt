@@ -24,6 +24,17 @@ class PatientTest {
         assertThat(newPatient.registerNo).isNotNull
     }
 
+    @Test
+    fun `환자 이름 수정`() {
+        val name = "김철수"
+        val updatedName = "나환자"
+        val newPatient = createPatient(name = name)
+        assertThat(newPatient.name).isEqualTo(name)
+
+        newPatient.changeName(updatedName)
+        assertThat(newPatient.name).isEqualTo(updatedName)
+    }
+
     private fun createPatient(
         hospitalId: Long = 1,
         name: String = "김환자",
