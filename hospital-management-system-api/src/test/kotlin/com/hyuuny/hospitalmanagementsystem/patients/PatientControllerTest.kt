@@ -80,4 +80,19 @@ class PatientControllerTest : IntegrationTest() {
             .assertThat().body("mobilePhoneNumber", equalTo(updateRequest.mobilePhoneNumber))
     }
 
+    @Test
+    fun `환자 삭제`() {
+        val request = aPatientCreateRequest()
+        val savedPatient = patientService.createPatient(request)
+
+        given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .log().all()
+            .delete("$PATIENT_REQUEST_URL/{id}", savedPatient.id)
+            .then()
+            .log().all()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+    }
+
 }
