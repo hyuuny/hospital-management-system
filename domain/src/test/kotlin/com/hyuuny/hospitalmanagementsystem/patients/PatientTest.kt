@@ -36,6 +36,17 @@ class PatientTest {
     }
 
     @Test
+    fun `생년월일 수정`() {
+        val brithDay = "1993-04-19"
+        val updatedBirthDay = "2000-01-01"
+        val newPatient = createPatient(brithDay = brithDay)
+        assertThat(newPatient.birthDay).isEqualTo(brithDay)
+
+        newPatient.changeBirthDay(updatedBirthDay)
+        assertThat(newPatient.birthDay).isEqualTo(updatedBirthDay)
+    }
+
+    @Test
     fun `성별 수정`() {
         val gender = "M"
         val updatedGender = "F"
