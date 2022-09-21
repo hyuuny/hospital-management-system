@@ -18,9 +18,9 @@ class Patient private constructor(
 
     gender: Gender,
 
-    birthDay: String,
+    birthDay: String? = null,
 
-    mobilePhoneNumber: String,
+    mobilePhoneNumber: String? = null,
 
     @OneToMany(mappedBy = "patient", fetch = FetchType.LAZY)
     val visits: MutableList<Visit>? = mutableListOf(),
@@ -31,8 +31,8 @@ class Patient private constructor(
             hospitalId: Long,
             name: String,
             gender: String,
-            birthDay: String,
-            mobilePhoneNumber: String,
+            birthDay: String? = null,
+            mobilePhoneNumber: String? = null,
             visits: MutableList<Visit>? = mutableListOf(),
         ): Patient = Patient(
             hospitalId = hospitalId,
@@ -70,11 +70,11 @@ class Patient private constructor(
         this.gender = Gender(gender)
     }
 
-    fun changeBirthDay(birthDay: String) {
+    fun changeBirthDay(birthDay: String?) {
         this.birthDay = birthDay
     }
 
-    fun changeMobilePhoneNumber(mobilePhoneNumber: String) {
+    fun changeMobilePhoneNumber(mobilePhoneNumber: String?) {
         this.mobilePhoneNumber = mobilePhoneNumber
     }
 
