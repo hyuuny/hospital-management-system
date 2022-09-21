@@ -8,31 +8,56 @@ plugins {
 	kotlin("plugin.jpa") version "1.6.21"
 }
 
-group = "com.hyuuny"
-version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_11
+allprojects {
+	group = "com.hyuuny"
+	version = "0.0.1-SNAPSHOT"
 
-repositories {
-	mavenCentral()
-}
-
-dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	runtimeOnly("com.h2database:h2")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
-
-tasks.withType<KotlinCompile> {
-	kotlinOptions {
-		freeCompilerArgs = listOf("-Xjsr305=strict")
-		jvmTarget = "11"
+	repositories {
+		mavenCentral()
 	}
 }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
+java.sourceCompatibility = JavaVersion.VERSION_11
+
+subprojects {
+	apply(plugin = "io.spring.dependency-management")
+	apply(plugin = "org.springframework.boot")
+	apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+
+	apply(plugin = "kotlin")
+	apply(plugin = "kotlin-spring")
+	apply(plugin = "kotlin-jpa")
+
+	dependencies {
+		implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+		implementation("org.springframework.boot:spring-boot-starter-web")
+		implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+		implementation("org.jetbrains.kotlin:kotlin-reflect")
+		implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+		runtimeOnly("com.h2database:h2")
+		testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+		// 로깅
+		implementation("io.github.microutils:kotlin-logging:1.12.5")
+	}
+
+	tasks.withType<KotlinCompile> {
+		kotlinOptions {
+			freeCompilerArgs = listOf("-Xjsr305=strict")
+			jvmTarget = "11"
+		}
+	}
+
+	tasks.withType<Test> {
+		useJUnitPlatform()
+	}
+
+}
+
+tasks.named("bootJar") {
+	enabled = false
+}
+
+tasks.named("jar") {
+	enabled = true
 }
