@@ -115,4 +115,17 @@ class PatientControllerTest : IntegrationTest() {
             .assertThat().body("mobilePhoneNumber", equalTo(request.mobilePhoneNumber))
     }
 
+    @Test
+    fun `환자 상세 조회 - 잘못된 아이디 예외`() {
+        given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .log().all()
+            .get("$PATIENT_REQUEST_URL/{id}", 999999)
+            .then()
+            .log().all()
+            .assertThat().body("code", equalTo(404))
+            .assertThat().body("message", equalTo("환자를 찾을 수 없습니다."))
+    }
+
 }
