@@ -40,6 +40,17 @@ class HospitalTest {
         assertThat(newHospital.code).isEqualTo(updatedCode)
     }
 
+    @Test
+    fun `병원장명 수정`() {
+        val hospitalDirectorName = "김원장"
+        val updatedHospitalDirectorName = "나원장"
+        val newHospital = createHospital(hospitalDirectorName = hospitalDirectorName)
+        assertThat(newHospital.hospitalDirectorName).isEqualTo(hospitalDirectorName)
+
+        newHospital.changeHospitalDirectorName(updatedHospitalDirectorName)
+        assertThat(newHospital.hospitalDirectorName).isEqualTo(updatedHospitalDirectorName)
+    }
+
     private fun createHospital(
         name: String = "성현내과",
         code: String = "11100082",
