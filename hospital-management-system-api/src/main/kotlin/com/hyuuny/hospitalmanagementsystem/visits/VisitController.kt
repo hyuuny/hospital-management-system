@@ -4,6 +4,7 @@ import org.springframework.hateoas.EntityModel
 import org.springframework.hateoas.server.RepresentationModelAssembler
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import org.springframework.web.bind.annotation.*
 
@@ -34,6 +35,15 @@ class VisitController(
     ): EntityModel<VisitResponse> {
         val updatedVisit = visitService.updateVisit(id, request)
         return visitResourceAssembler.toModel(updatedVisit)
+    }
+
+    @DeleteMapping("/{id}")
+    fun deleteVisit(
+        @PathVariable patientId: Long,
+        @PathVariable id: Long,
+    ): ResponseEntity<Any> {
+        visitService.deleteVisit(id)
+        return ResponseEntity.noContent().build()
     }
 
     @GetMapping("/{id}")
