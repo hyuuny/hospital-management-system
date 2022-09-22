@@ -7,6 +7,6 @@ interface PatientReader {
 
     fun getPatient(id: Long): Patient
 
-    fun retrievePatient(pageable: Pageable): PageImpl<SearchedPatientListing>
+    fun retrievePatients(pageable: Pageable): PageImpl<SearchedPatientListing>
 
 }

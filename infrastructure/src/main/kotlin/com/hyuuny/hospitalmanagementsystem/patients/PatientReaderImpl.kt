@@ -14,7 +14,7 @@ class PatientReaderImpl(
     override fun getPatient(id: Long): Patient =
         patientRepository.findByIdOrNull(id) ?: throw NotFountException("환자를 찾을 수 없습니다.")
 
-    override fun retrievePatient(pageable: Pageable): PageImpl<SearchedPatientListing> =
+    override fun retrievePatients(pageable: Pageable): PageImpl<SearchedPatientListing> =
         patientRepository.retrievePatients(pageable)
 
 }
