@@ -1,6 +1,8 @@
 package com.hyuuny.hospitalmanagementsystem.patients
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include
 import com.hyuuny.hospitalmanagementsystem.visits.Visit
 import com.hyuuny.hospitalmanagementsystem.visits.VisitResponse
 import java.time.LocalDateTime
@@ -66,6 +68,36 @@ data class PatientResponse(
                 lastModifiedAt = lastModifiedAt,
             )
         }
+    }
+}
+
+@JsonInclude(Include.NON_NULL)
+data class PatientListingResponse(
+    val id: Long,
+    val hospitalId: Long,
+    val name: String,
+    val registerNo: String,
+    val gender: Gender,
+    val birthDay: String?,
+    val mobilePhoneNumber: String?,
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    val receptionDateTime: LocalDateTime?,
+) {
+    companion object {
+        operator fun invoke(searchedPatientListing: SearchedPatientListing) =
+            with(searchedPatientListing) {
+                PatientListingResponse(
+                    id = id!!,
+                    hospitalId = hospitalId!!,
+                    name = name!!,
+                    registerNo = registerNo!!,
+                    gender = gender!!,
+                    birthDay = birthDay,
+                    mobilePhoneNumber = mobilePhoneNumber,
+                    receptionDateTime = receptionDateTime,
+                )
+            }
     }
 }
 
