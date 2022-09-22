@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
+import java.time.LocalDate
 import java.util.stream.IntStream
 
 const val PATIENT_REQUEST_URL = "/api/v1/patients"
@@ -210,6 +211,177 @@ class PatientControllerTest : IntegrationTest() {
             assertThat().body("page.totalElements", IsEqual.equalTo(11))
             assertThat().body("page.totalPages", IsEqual.equalTo(2))
             assertThat().body("page.number", IsEqual.equalTo(0))
+        }
+    }
+
+    @Test
+    fun `환자 목록 조회 - 환자 이름 검색`() {
+        IntStream.range(0, 11).forEach { value ->
+            run {
+                val request = PatientCreateRequest(
+                    hospitalId = 1L,
+                    name = "${value}위 성현내과",
+                    gender = "M",
+                    birthDay = "1993-01-01",
+                    mobilePhoneNumber = "010-1234-1234",
+                )
+                val savedPatient = patientService.createPatient(request)
+
+                IntStream.range(0, 3).forEach {
+                    val requestVisit = VisitCreateRequest(
+                        hospitalId = 1,
+                        visitStatus = "VISITING",
+                        diagnosisType = "D"
+                    )
+                    visitService.createVisit(savedPatient.id, requestVisit)
+                }
+            }
+        }
+
+        Given {
+            contentType(ContentType.JSON)
+            queryParam("name", "3위 성현내과")
+        } When {
+            log().all()
+            get(PATIENT_REQUEST_URL)
+        } Then {
+            log().all()
+            statusCode(HttpStatus.OK.value())
+            assertThat().body("page.size", IsEqual.equalTo(10))
+            assertThat().body("page.totalElements", IsEqual.equalTo(1))
+            assertThat().body("page.totalPages", IsEqual.equalTo(1))
+            assertThat().body("page.number", IsEqual.equalTo(0))
+            assertThat().body("_embedded.patientListingResponseList[0].name", equalTo("3위 성현내과"))
+            assertThat().body("_embedded.patientListingResponseList[0].gender", equalTo("M"))
+            assertThat().body(
+                "_embedded.patientListingResponseList[0].birthDay",
+                equalTo("1993-01-01")
+            )
+            assertThat().body(
+                "_embedded.patientListingResponseList[0].mobilePhoneNumber",
+                equalTo("010-1234-1234")
+            )
+            assertThat().body(
+                "_embedded.patientListingResponseList[0].receptionDateTime",
+                equalTo(LocalDate.now().toString())
+            )
+        }
+    }
+
+    @Test
+    fun `환자 목록 조회 - 환자등록번호 검색`() {
+        var expectedRegisterNo = ""
+        IntStream.range(0, 11).forEach { value ->
+            run {
+                val request = PatientCreateRequest(
+                    hospitalId = 1L,
+                    name = "${value}위 성현내과",
+                    gender = "M",
+                    birthDay = "1993-01-01",
+                    mobilePhoneNumber = "010-1234-1234",
+                )
+                val savedPatient = patientService.createPatient(request)
+
+                if (value == 3) {
+                    expectedRegisterNo = savedPatient.registerNo
+                }
+
+                IntStream.range(0, 3).forEach {
+                    val requestVisit = VisitCreateRequest(
+                        hospitalId = 1,
+                        visitStatus = "VISITING",
+                        diagnosisType = "D"
+                    )
+                    visitService.createVisit(savedPatient.id, requestVisit)
+                }
+            }
+        }
+
+        Given {
+            contentType(ContentType.JSON)
+            queryParam("registerNo", expectedRegisterNo)
+        } When {
+            log().all()
+            get(PATIENT_REQUEST_URL)
+        } Then {
+            log().all()
+            statusCode(HttpStatus.OK.value())
+            assertThat().body("page.size", IsEqual.equalTo(10))
+            assertThat().body("page.totalElements", IsEqual.equalTo(1))
+            assertThat().body("page.totalPages", IsEqual.equalTo(1))
+            assertThat().body("page.number", IsEqual.equalTo(0))
+            assertThat().body("_embedded.patientListingResponseList[0].name", equalTo("3위 성현내과"))
+            assertThat().body("_embedded.patientListingResponseList[0].gender", equalTo("M"))
+            assertThat().body(
+                "_embedded.patientListingResponseList[0].registerNo",
+                equalTo(expectedRegisterNo)
+            )
+            assertThat().body(
+                "_embedded.patientListingResponseList[0].birthDay",
+                equalTo("1993-01-01")
+            )
+            assertThat().body(
+                "_embedded.patientListingResponseList[0].mobilePhoneNumber",
+                equalTo("010-1234-1234")
+            )
+            assertThat().body(
+                "_embedded.patientListingResponseList[0].receptionDateTime",
+                equalTo(LocalDate.now().toString())
+            )
+        }
+    }
+
+    @Test
+    fun `환자 목록 조회 - 생년월일 검색`() {
+        IntStream.range(20, 31).forEach { value ->
+            run {
+                val request = PatientCreateRequest(
+                    hospitalId = 1L,
+                    name = "${value}위 성현내과",
+                    gender = "M",
+                    birthDay = "1993-01-${value}",
+                    mobilePhoneNumber = "010-1234-1234",
+                )
+                val savedPatient = patientService.createPatient(request)
+
+                IntStream.range(0, 3).forEach {
+                    val requestVisit = VisitCreateRequest(
+                        hospitalId = 1,
+                        visitStatus = "VISITING",
+                        diagnosisType = "D"
+                    )
+                    visitService.createVisit(savedPatient.id, requestVisit)
+                }
+            }
+        }
+
+        Given {
+            contentType(ContentType.JSON)
+            queryParam("birthDay", "1993-01-22")
+        } When {
+            log().all()
+            get(PATIENT_REQUEST_URL)
+        } Then {
+            log().all()
+            statusCode(HttpStatus.OK.value())
+            assertThat().body("page.size", IsEqual.equalTo(10))
+            assertThat().body("page.totalElements", IsEqual.equalTo(1))
+            assertThat().body("page.totalPages", IsEqual.equalTo(1))
+            assertThat().body("page.number", IsEqual.equalTo(0))
+            assertThat().body("_embedded.patientListingResponseList[0].name", equalTo("22위 성현내과"))
+            assertThat().body("_embedded.patientListingResponseList[0].gender", equalTo("M"))
+            assertThat().body(
+                "_embedded.patientListingResponseList[0].birthDay",
+                equalTo("1993-01-22")
+            )
+            assertThat().body(
+                "_embedded.patientListingResponseList[0].mobilePhoneNumber",
+                equalTo("010-1234-1234")
+            )
+            assertThat().body(
+                "_embedded.patientListingResponseList[0].receptionDateTime",
+                equalTo(LocalDate.now().toString())
+            )
         }
     }
 

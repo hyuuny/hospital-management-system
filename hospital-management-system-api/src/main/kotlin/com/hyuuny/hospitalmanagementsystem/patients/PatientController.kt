@@ -50,10 +50,11 @@ class PatientController(
 
     @GetMapping
     fun retrievePatients(
+        searchCondition: PatientSearchCondition,
         @PageableDefault(sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable,
         pagedResourcesAssembler: PagedResourcesAssembler<PatientListingResponse>,
     ): ResponseEntity<PagedModel<EntityModel<PatientListingResponse>>> {
-        val page = patientService.retrievePatients(pageable)
+        val page = patientService.retrievePatients(searchCondition, pageable)
         return ResponseEntity.ok(
             pagedResourcesAssembler.toModel(page, patientListingResourceAssembler)
         )

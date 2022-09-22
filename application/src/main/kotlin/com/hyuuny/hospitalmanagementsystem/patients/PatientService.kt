@@ -33,11 +33,13 @@ class PatientService(
     @Transactional
     fun deletePatient(id: Long) = patientStore.delete(id)
 
-    fun retrievePatients(pageable: Pageable): PageImpl<PatientListingResponse> {
-        val searched = patientReader.retrievePatients(pageable)
-        val content = searched.content.map { PatientListingResponse(it) }
-            .toList()
-        return PageImpl(content, pageable, searched.totalElements)
+    fun retrievePatients(
+        searchCondition: PatientSearchCondition,
+        pageable: Pageable,
+    ): PageImpl<PatientListingResponse> {
+        val searched = patientReader.retrievePatients(searchCondition, pageable)
+        val searchedPatients = SearchedPatients(searched.content)
+        return PageImpl(searchedPatients.toPage(), pageable, searched.totalElements)
     }
 
 }
