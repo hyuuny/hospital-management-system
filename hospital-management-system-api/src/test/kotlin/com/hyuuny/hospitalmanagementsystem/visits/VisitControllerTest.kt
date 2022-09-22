@@ -72,4 +72,19 @@ class VisitControllerTest : IntegrationTest() {
         }
     }
 
+    @Test
+    fun `환자 방문 기록 상세 조회 - 잘못된 아이디 예외`() {
+        val savedPatient = patientService.createPatient(aPatientCreateRequest())
+
+        Given {
+            contentType(ContentType.JSON)
+        } When {
+            log()
+            get("$VISIT_REQUEST_URL/{id}", savedPatient.id, 99999)
+        } Then {
+            body("code", equalTo(404))
+            body("message", equalTo("환자 방문 이력을 찾을 수 없습니다."))
+        }
+    }
+
 }
