@@ -142,4 +142,21 @@ class VisitControllerTest : IntegrationTest() {
         }
     }
 
+    @Test
+    fun `환자 방문 기록 삭제`() {
+        val savedPatient = patientService.createPatient(aPatientCreateRequest())
+        val request = aVisitCreateRequest()
+        val savedVisit = visitService.createVisit(savedPatient.id, request)
+
+        Given {
+            contentType(ContentType.JSON)
+        } When {
+            log().all()
+            delete("$VISIT_REQUEST_URL/{id}", savedPatient.id, savedVisit.id)
+        } Then {
+            log().all()
+            statusCode(HttpStatus.NO_CONTENT.value())
+        }
+    }
+
 }
