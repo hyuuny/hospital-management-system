@@ -425,4 +425,44 @@ class PatientControllerTest : IntegrationTest() {
         }
     }
 
+    @Test
+    fun `환자 목록 조회 - 페이지사이즈 8`() {
+        IntStream.range(0, 11).forEach { value ->
+            run {
+                val request = PatientCreateRequest(
+                    hospitalId = 1L,
+                    name = "${value}위 성현내과",
+                    gender = "M",
+                    birthDay = "1993-01-01",
+                    mobilePhoneNumber = "010-1234-1234",
+                )
+                val savedPatient = patientService.createPatient(request)
+
+                IntStream.range(0, 3).forEach {
+                    val requestVisit = VisitCreateRequest(
+                        hospitalId = 1,
+                        visitStatus = "VISITING",
+                        diagnosisType = "D"
+                    )
+                    visitService.createVisit(savedPatient.id, requestVisit)
+                }
+            }
+        }
+
+        Given {
+            contentType(ContentType.JSON)
+            queryParam("size", 8)
+        } When {
+            log().all()
+            get(PATIENT_REQUEST_URL)
+        } Then {
+            log().all()
+            statusCode(HttpStatus.OK.value())
+            assertThat().body("page.size", IsEqual.equalTo(8))
+            assertThat().body("page.totalElements", IsEqual.equalTo(11))
+            assertThat().body("page.totalPages", IsEqual.equalTo(2))
+            assertThat().body("page.number", IsEqual.equalTo(0))
+        }
+    }
+
 }
