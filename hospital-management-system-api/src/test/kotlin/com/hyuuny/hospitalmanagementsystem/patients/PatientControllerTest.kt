@@ -7,12 +7,14 @@ import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
+import org.hamcrest.core.IsEqual
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
+import java.util.stream.IntStream
 
 const val PATIENT_REQUEST_URL = "/api/v1/patients"
 
@@ -126,6 +128,35 @@ class PatientControllerTest : IntegrationTest() {
             .log().all()
             .assertThat().body("code", equalTo(404))
             .assertThat().body("message", equalTo("환자를 찾을 수 없습니다."))
+    }
+
+    @Test
+    fun `환자 목록 조회`() {
+        IntStream.range(0, 11).forEach { value ->
+            run {
+                val request = PatientCreateRequest(
+                    hospitalId = 1L,
+                    name = "${value}위 성현내과",
+                    gender = "M",
+                    birthDay = "1993-01-01",
+                    mobilePhoneNumber = "010-1234-1234",
+                )
+                patientService.createPatient(request)
+            }
+        }
+
+        given()
+            .contentType(ContentType.JSON)
+            .`when`()
+            .log().all()
+            .get(PATIENT_REQUEST_URL)
+            .then()
+            .log().all()
+            .statusCode(HttpStatus.OK.value())
+            .assertThat().body("page.size", IsEqual.equalTo(10))
+            .assertThat().body("page.totalElements", IsEqual.equalTo(11))
+            .assertThat().body("page.totalPages", IsEqual.equalTo(2))
+            .assertThat().body("page.number", IsEqual.equalTo(0))
     }
 
 }
