@@ -1,5 +1,7 @@
 package com.hyuuny.hospitalmanagementsystem.patients
 
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -30,5 +32,12 @@ class PatientService(
 
     @Transactional
     fun deletePatient(id: Long) = patientStore.delete(id)
+
+    fun retrievePatients(pageable: Pageable): PageImpl<PatientListingResponse> {
+        val searched = patientReader.retrievePatients(pageable)
+        val content = searched.content.map { PatientListingResponse(it) }
+            .toList()
+        return PageImpl(content, pageable, searched.totalElements)
+    }
 
 }
