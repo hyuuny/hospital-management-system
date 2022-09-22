@@ -5,10 +5,7 @@ import org.springframework.hateoas.server.RepresentationModelAssembler
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RequestMapping(
     path = ["/api/v1/{patientId}/visits"],
@@ -19,6 +16,15 @@ class VisitController(
     private val visitService: VisitService,
     private val visitResourceAssembler: VisitResourceAssembler,
 ) {
+
+    @PostMapping
+    fun createVisit(
+        @PathVariable patientId: Long,
+        @RequestBody request: VisitCreateRequest
+    ): EntityModel<VisitResponse> {
+        val savedVisit = visitService.createVisit(patientId, request)
+        return visitResourceAssembler.toModel(savedVisit)
+    }
 
     @GetMapping("/{id}")
     fun getVisit(
