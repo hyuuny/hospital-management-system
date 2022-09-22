@@ -26,6 +26,16 @@ class VisitController(
         return visitResourceAssembler.toModel(savedVisit)
     }
 
+    @PutMapping("/{id}")
+    fun updateVisit(
+        @PathVariable patientId: Long,
+        @PathVariable id: Long,
+        @RequestBody request: VisitUpdateRequest
+    ): EntityModel<VisitResponse> {
+        val updatedVisit = visitService.updateVisit(id, request)
+        return visitResourceAssembler.toModel(updatedVisit)
+    }
+
     @GetMapping("/{id}")
     fun getVisit(
         @PathVariable patientId: Long,
