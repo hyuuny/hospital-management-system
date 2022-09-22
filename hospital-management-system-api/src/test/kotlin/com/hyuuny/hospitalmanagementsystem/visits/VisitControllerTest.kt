@@ -18,6 +18,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.web.server.LocalServerPort
 import org.springframework.http.HttpStatus
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 const val VISIT_REQUEST_URL = "/api/v1/{patientId}/visits"
 
@@ -58,10 +60,10 @@ class VisitControllerTest : IntegrationTest() {
         Given {
             contentType(ContentType.JSON)
         } When {
-            log()
+            log().all()
             get("$VISIT_REQUEST_URL/{id}", savedPatient.id, savedVisit.id)
         } Then {
-            log()
+            log().all()
             statusCode(HttpStatus.OK.value())
             body(containsString("id"))
             body("hospitalId", equalTo(1))
@@ -79,7 +81,7 @@ class VisitControllerTest : IntegrationTest() {
         Given {
             contentType(ContentType.JSON)
         } When {
-            log()
+            log().all()
             get("$VISIT_REQUEST_URL/{id}", savedPatient.id, 99999)
         } Then {
             body("code", equalTo(404))
@@ -96,10 +98,10 @@ class VisitControllerTest : IntegrationTest() {
             contentType(ContentType.JSON)
             body(request)
         } When {
-            log()
+            log().all()
             post(VISIT_REQUEST_URL, savedPatient.id)
         } Then {
-            log()
+            log().all()
             statusCode(HttpStatus.OK.value())
             body(containsString("id"))
             body("hospitalId", equalTo(1))
@@ -107,6 +109,36 @@ class VisitControllerTest : IntegrationTest() {
             body("visitStatus", equalTo(request.visitStatus))
             body("diagnosisType", equalTo(request.diagnosisType))
             body(containsString("receptionDateTime"))
+        }
+    }
+
+    @Test
+    fun `환자 방문 기록 수정`() {
+        val savedPatient = patientService.createPatient(aPatientCreateRequest())
+        val request = aVisitCreateRequest()
+        val savedVisit = visitService.createVisit(savedPatient.id, request)
+
+        val updateRequest = VisitUpdateRequest(
+            visitStatus = "END",
+            diagnosisType = "T",
+            receptionDateTime = LocalDateTime.now().minusDays(5)
+        )
+
+        Given {
+            contentType(ContentType.JSON)
+            body(updateRequest)
+        } When {
+            log().all()
+            put("$VISIT_REQUEST_URL/{id}", savedPatient.id, savedVisit.id)
+        } Then {
+            log().all()
+            statusCode(HttpStatus.OK.value())
+            body(containsString("id"))
+            body("hospitalId", equalTo(1))
+            body("patientId", equalTo(savedPatient.id.toInt()))
+            body("visitStatus", equalTo(updateRequest.visitStatus))
+            body("diagnosisType", equalTo(updateRequest.diagnosisType))
+            body("receptionDateTime", equalTo(LocalDate.now().minusDays(5).toString()))
         }
     }
 
