@@ -40,6 +40,7 @@ class PatientRepositoryImpl(
                     registerNoEq(searchCondition.registerNo),
                     birthDayEq(searchCondition.birthDay),
                 )
+                .groupBy(patient.id)
         )
 
     }
