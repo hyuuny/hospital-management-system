@@ -2,9 +2,15 @@ package com.hyuuny.hospitalmanagementsystem.patients
 
 import com.hyuuny.hospitalmanagementsystem.FixturePatient.Companion.aPatientCreateRequest
 import com.hyuuny.hospitalmanagementsystem.common.IntegrationTest
+import com.hyuuny.hospitalmanagementsystem.visits.VisitCreateRequest
+import com.hyuuny.hospitalmanagementsystem.visits.VisitRepository
+import com.hyuuny.hospitalmanagementsystem.visits.VisitService
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
+import io.restassured.module.kotlin.extensions.Given
+import io.restassured.module.kotlin.extensions.Then
+import io.restassured.module.kotlin.extensions.When
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.core.IsEqual
@@ -30,6 +36,7 @@ class PatientControllerTest : IntegrationTest() {
 
     @AfterEach
     fun afterEach() {
+        visitRepository.deleteAll()
         patientRepository.deleteAll()
     }
 
@@ -38,6 +45,12 @@ class PatientControllerTest : IntegrationTest() {
 
     @Autowired
     lateinit var patientService: PatientService
+
+    @Autowired
+    lateinit var visitRepository: VisitRepository
+
+    @Autowired
+    lateinit var visitService: VisitService
 
     @Test
     fun `환자 등록`() {
@@ -128,6 +141,42 @@ class PatientControllerTest : IntegrationTest() {
             .log().all()
             .assertThat().body("code", equalTo(404))
             .assertThat().body("message", equalTo("환자를 찾을 수 없습니다."))
+    }
+
+    @Test
+    fun `환자 상세 조회 - 방문 기록도 같이 조회`() {
+        val request = aPatientCreateRequest()
+        val savedPatient = patientService.createPatient(request)
+
+        IntStream.range(0, 5).forEach {
+            run {
+                val requestVisit = VisitCreateRequest(
+                    hospitalId = 1,
+                    visitStatus = "VISITING",
+                    diagnosisType = "D"
+                )
+                visitService.createVisit(savedPatient.id, requestVisit)
+            }
+        }
+
+        Given {
+            contentType(ContentType.JSON)
+        } When {
+            log().all()
+            get("$PATIENT_REQUEST_URL/{ia}", savedPatient.id)
+        }Then {
+            log().all()
+            assertThat().body(containsString("id"))
+            assertThat().body("name", equalTo(request.name))
+            assertThat().body("gender", equalTo(request.gender))
+            assertThat().body("birthDay", equalTo(request.birthDay))
+            assertThat().body("mobilePhoneNumber", equalTo(request.mobilePhoneNumber))
+            assertThat().body("visits[0].patientId", equalTo(savedPatient.id.toInt()))
+            assertThat().body("visits[0].visitStatus", equalTo("VISITING"))
+            assertThat().body("visits[0].diagnosisType", equalTo("D"))
+            assertThat().body("visits.size()", equalTo(5))
+        }
+
     }
 
     @Test
