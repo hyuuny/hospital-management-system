@@ -36,7 +36,7 @@ data class VisitResponse(
     val visitStatus: VisitStatus,
     val diagnosisType: DiagnosisType,
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     val receptionDateTime: LocalDateTime,
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
