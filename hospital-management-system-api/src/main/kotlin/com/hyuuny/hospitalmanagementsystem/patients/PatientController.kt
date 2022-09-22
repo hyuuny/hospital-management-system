@@ -1,6 +1,11 @@
 package com.hyuuny.hospitalmanagementsystem.patients
 
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.data.web.PageableDefault
+import org.springframework.data.web.PagedResourcesAssembler
 import org.springframework.hateoas.EntityModel
+import org.springframework.hateoas.PagedModel
 import org.springframework.hateoas.server.RepresentationModelAssembler
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder
 import org.springframework.http.MediaType
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.*
 class PatientController(
     private val patientService: PatientService,
     private val patientResourceAssembler: PatientResourceAssembler,
+    private val patientListingResourceAssembler: PatientListingResourceAssembler,
 ) {
 
     @PostMapping
@@ -43,15 +49,37 @@ class PatientController(
     }
 
     @GetMapping
-    fun retrievePatients() {
-
+    fun retrievePatients(
+        @PageableDefault(sort = ["createdAt"], direction = Sort.Direction.DESC) pageable: Pageable,
+        pagedResourcesAssembler: PagedResourcesAssembler<PatientListingResponse>,
+    ): ResponseEntity<PagedModel<EntityModel<PatientListingResponse>>> {
+        val page = patientService.retrievePatients(pageable)
+        return ResponseEntity.ok(
+            pagedResourcesAssembler.toModel(page, patientListingResourceAssembler)
+        )
     }
 
     @Component
-    companion object PatientResourceAssembler :
+    class PatientResourceAssembler :
         RepresentationModelAssembler<PatientResponse, EntityModel<PatientResponse>> {
 
         override fun toModel(entity: PatientResponse): EntityModel<PatientResponse> {
+            return EntityModel.of(
+                entity,
+                WebMvcLinkBuilder.linkTo(
+                    WebMvcLinkBuilder.methodOn(PatientController::class.java)
+                        .getPatient(entity.id)
+                )
+                    .withSelfRel()
+            )
+        }
+    }
+
+    @Component
+    class PatientListingResourceAssembler :
+        RepresentationModelAssembler<PatientListingResponse, EntityModel<PatientListingResponse>> {
+
+        override fun toModel(entity: PatientListingResponse): EntityModel<PatientListingResponse> {
             return EntityModel.of(
                 entity,
                 WebMvcLinkBuilder.linkTo(
