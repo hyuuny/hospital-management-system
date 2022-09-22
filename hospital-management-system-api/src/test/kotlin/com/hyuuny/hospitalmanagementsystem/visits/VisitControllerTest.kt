@@ -87,4 +87,27 @@ class VisitControllerTest : IntegrationTest() {
         }
     }
 
+    @Test
+    fun `환자 방문 기록 등록`() {
+        val savedPatient = patientService.createPatient(aPatientCreateRequest())
+        val request = aVisitCreateRequest()
+
+        Given {
+            contentType(ContentType.JSON)
+            body(request)
+        } When {
+            log()
+            post(VISIT_REQUEST_URL, savedPatient.id)
+        } Then {
+            log()
+            statusCode(HttpStatus.OK.value())
+            body(containsString("id"))
+            body("hospitalId", equalTo(1))
+            body("patientId", equalTo(savedPatient.id.toInt()))
+            body("visitStatus", equalTo(request.visitStatus))
+            body("diagnosisType", equalTo(request.diagnosisType))
+            body(containsString("receptionDateTime"))
+        }
+    }
+
 }
